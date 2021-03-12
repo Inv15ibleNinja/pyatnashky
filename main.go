@@ -55,6 +55,16 @@ func (f *Field) Init(size int, inline []int) {
 
 func (field *Field) Move(key string) {
 	//двигаем нолик по полю
+	for i, v := range field.field { //ищем где нолик
+		for j, vv := range v {
+			if vv == 0 {
+				//нашли нолик, проверим, можно ли двигать - крайние положения где i==0||i==siza-1 или j ==0 ||j== size-1
+				//лучше написать отдельную функцию првоерки, в которую передавать координаты начала и направление
+
+			}
+		}
+	}
+
 	switch key {
 	case "ArrUp":
 	//0 уходит вниз
