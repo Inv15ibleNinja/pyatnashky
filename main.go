@@ -55,17 +55,33 @@ func (f *Field) Init(size int, inline []int) {
 
 func (field *Field) Move(key string) {
 	//двигаем нолик по полю
+	switch key {
+	case "ArrUp":
+	//0 уходит вниз
+
+	case "ArrDown":
+	//0 уходит вверх
+	case "ArrLeft":
+	//0 уходит вправо
+	case "ArrRight":
+		//0 уходит влево
+
+	}
 }
 
 func (field *Field) Show() {
-	wr := tabwriter.NewWriter(os.Stdout, 0, 0, 1, '.', tabwriter.AlignRight|tabwriter.Debug)
+	wr := tabwriter.NewWriter(os.Stdout, 4, 0, 1, ' ', tabwriter.AlignRight)
 	for _, w := range field.field {
 		var str string
 		for i, v := range w {
 			//fmt.Print(strconv.Itoa(v) + "  ")
-			str += strconv.Itoa((v))
-			if i != len(w)-1 {
-				str += " "
+			if v == 0 {
+				str += "#"
+			} else {
+				str += strconv.Itoa((v))
+			}
+			if i != len(w) {
+				str += "\t"
 			}
 		}
 		fmt.Fprintln(wr, str)
@@ -136,7 +152,6 @@ func main() {
 		cmd.Stdout = os.Stdout
 		cmd.Run()
 		f1.Show()
-		fmt.Println("upd")
 	}
 
 }

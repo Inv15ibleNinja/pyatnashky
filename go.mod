@@ -1,4 +1,4 @@
-module pyatnashki
+module pyatnashky
 
 go 1.15
 
