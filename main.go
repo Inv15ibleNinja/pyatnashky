@@ -19,6 +19,14 @@ type Field struct {
 	size  int
 }
 
+const (
+	arrUp    = "ArrUp"
+	arrDown  = "ArrDown"
+	arrLeft  = "ArrLeft"
+	arrRight = "ArrRight"
+	space    = "Space"
+)
+
 func (f *Field) Init(size int, inline []int) {
 	f.size = size
 	rand.Seed(time.Now().UTC().UnixNano())
@@ -52,33 +60,61 @@ func (f *Field) Init(size int, inline []int) {
 		}
 	}
 }
-
-func (field *Field) Move(key string) {
-	//двигаем нолик по полю
-	for i, v := range field.field { //ищем где нолик
-		for j, vv := range v {
-			if vv == 0 {
-				//нашли нолик, проверим, можно ли двигать - крайние положения где i==0||i==siza-1 или j ==0 ||j== size-1
-				//лучше написать отдельную функцию првоерки, в которую передавать координаты начала и направление
-
-			}
-		}
-	}
-
-	switch key {
-	case "ArrUp":
-	//0 уходит вниз
-
-	case "ArrDown":
-	//0 уходит вверх
-	case "ArrLeft":
-	//0 уходит вправо
-	case "ArrRight":
-		//0 уходит влево
-
-	}
+func swap(x *int, y *int) {
+	tmp := x
+	x = y
+	y = tmp
 }
 
+// func (field *Field) Move1(key string) {
+// 	//двигаем нолик по полю
+// 	var x, y int
+// 	// i - row, j - column
+// 	for i, v := range field.field { //ищем где нолик
+// 		for j, vv := range v {
+// 			if vv == 0 {
+// 				x = i
+// 				y = j
+// 				switch key {
+// 				case arrDown :
+// 					if x != 0 {
+// 						tmpfield[i][j]
+// 				}
+// 			}
+// 			if vv == 15 {
+// 				x = i
+// 				y = j
+// 				fmt.Println("X: " + strconv.Itoa(x) + " Y: " + strconv.Itoa(y) + " Key: " + "15")
+// 			}
+// 		}
+// 	}
+// 	fmt.Println("X: " + strconv.Itoa(x) + " Y: " + strconv.Itoa(y) + " Key: " + key)
+// 	switch key {
+// 	//0 уходит вниз
+// 	case "ArrUp":
+// 		if x != 0 {
+// 			swap(&field.field[x][y], &field.field[x+1][y])
+// 		}
+// 	//0 уходит вверх
+// 	case "ArrDown":
+// 		if x != 0 {
+// 			//field
+// 			//swap(&field.field[x][y], &field.field[x+1][y])
+// 			//field.field[x][y], field.field[x+1][y] = field.field[x+1][y], field.field[x][y]
+// 			fmt.Println("нажал вниз")
+// 		}
+// 	//0 уходит вправо
+// 	case "ArrLeft":
+// 		if y != 0 {
+// 			swap(&field.field[x][y], &field.field[x+1][y])
+// 		}
+// 	//0 уходит влево
+// 	case "ArrRight":
+// 		if y != 0 {
+// 			swap(&field.field[x][y], &field.field[x+1][y])
+// 		}
+// 	}
+// }
 func (field *Field) Show() {
 	wr := tabwriter.NewWriter(os.Stdout, 4, 0, 1, ' ', tabwriter.AlignRight)
 	for _, w := range field.field {
@@ -97,9 +133,54 @@ func (field *Field) Show() {
 		fmt.Fprintln(wr, str)
 		wr.Flush()
 	}
-
 }
 
+func (f *Field) Move(key string) {
+	for i := 0; i < f.size; i++ {
+		for j := 0; j < f.size; j++ {
+			if f.field[i][j] == 0 {
+				//нашли где пустая клетка, проверяем, можно ли двигать в указанном направлении
+				switch key {
+				case arrDown:
+					{
+						if i != 0 {
+							tmp := f.field[i-1][j]
+							f.field[i-1][j] = 0
+							f.field[i][j] = tmp
+						}
+					}
+				case arrUp:
+					{
+						if i != f.size-1 {
+							tmp := f.field[i+1][j]
+							f.field[i+1][j] = 0
+							f.field[i][j] = tmp
+						}
+					}
+				case arrLeft:
+					{
+						if j != f.size-1 {
+							tmp := f.field[i][j+1]
+							f.field[i][j+1] = 0
+							f.field[i][j] = tmp
+						}
+					}
+				case arrRight:
+					{
+						if j != 0 {
+							tmp := f.field[i][j-1]
+							f.field[i][j-1] = 0
+							f.field[i][j] = tmp
+						}
+					}
+				}
+			}
+
+		}
+
+	}
+
+}
 func reset() {
 	term.Sync() // cosmestic purpose
 }
@@ -133,34 +214,35 @@ func main() {
 				break keyPressListenerLoop
 			case term.KeyArrowUp:
 				reset()
-				keyPressed = "ArrUp"
+				keyPressed = arrUp
 			case term.KeyArrowDown:
 				reset()
-				keyPressed = "ArrDown"
+				keyPressed = arrDown
 			case term.KeyArrowLeft:
 				reset()
-				keyPressed = "ArrLeft"
+				keyPressed = arrLeft
 			case term.KeyArrowRight:
 				reset()
-				keyPressed = "ArrRight"
+				keyPressed = arrRight
 			case term.KeySpace:
 				reset()
-				keyPressed = "Space"
+				keyPressed = space
 				os.Exit(0)
 
 			default:
-				// we only want to read a single character or one key pressed event
 				reset()
-				//fmt.Println("ASCII : ", ev.Ch)
 
 			}
 		case term.EventError:
 			panic(ev.Err)
 		}
+		//двигаем фишки
 		f1.Move(keyPressed)
-		cmd := exec.Command("cmd", "/c", "cls") //Windows example, its tested
+		//чистим экран
+		cmd := exec.Command("cmd", "/c", "cls")
 		cmd.Stdout = os.Stdout
 		cmd.Run()
+		//отображаем обновленное поле
 		f1.Show()
 	}
 
